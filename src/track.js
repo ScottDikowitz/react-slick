@@ -54,13 +54,14 @@ var getKey = (child, fallbackKey) => {
     // key could be a zero
     return (child.key === null || child.key === undefined) ? fallbackKey : child.key;
 };
-
+var totalWidth;
 var renderSlides = function (spec) {
   var key;
   var slides = [];
   var preCloneSlides = [];
   var postCloneSlides = [];
   var count = React.Children.count(spec.children);
+  totalWidth = 0;
 
 
   React.Children.forEach(spec.children, (elem, index) => {
@@ -102,6 +103,9 @@ var renderSlides = function (spec) {
       style: assign({outline: 'none'}, child.props.style || {}, childStyle),
       onClick
     }));
+    if (child.props.style && child.props.style.width) {
+            totalWidth += child.props.style.width;
+        }
 
     // variableWidth doesn't wrap properly.
     if (spec.infinite && spec.fade === false) {
@@ -116,6 +120,9 @@ var renderSlides = function (spec) {
           style: assign({}, child.props.style || {}, childStyle),
           onClick
         }));
+        if (child.props.style && child.props.style.width) {
+            totalWidth += child.props.style.width;
+        }
       }
 
       if (index < infiniteCount) {
@@ -127,6 +134,9 @@ var renderSlides = function (spec) {
           style: assign({}, child.props.style || {}, childStyle),
           onClick
         }));
+        if (child.props.style && child.props.style.width) {
+            totalWidth += child.props.style.width;
+        }
       }
     }
   });
@@ -143,8 +153,11 @@ var renderSlides = function (spec) {
 export var Track = React.createClass({
   render: function () {
     var slides = renderSlides.call(this, this.props);
+    var trackStyle = this.props.variableWidth ?
+        assign({}, this.props.trackStyle, {width: totalWidth}) :
+        this.props.trackStyle;
     return (
-      <div className='slick-track' style={this.props.trackStyle}>
+      <div className='slick-track' style={trackStyle}>
         { slides }
       </div>
     );
